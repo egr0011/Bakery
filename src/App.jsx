@@ -3,6 +3,7 @@ import Nav from './Frontend/Nav/nav';
 import Home from './Frontend/Home/home';
 import Footer from './Frontend/Footer/footer';
 import AdminLogin from './Frontend/Admin/adminlogin';  // Corrected import
+import Admin from './Frontend/Admin/admin';
 
 function Layout() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
     </BrowserRouter>
