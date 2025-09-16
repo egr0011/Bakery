@@ -24,6 +24,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+// Admin login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -53,6 +55,43 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
     });
     await product.save();
     res.status(200).json({ message: "Product added successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+// Delete product by category and name
+router.delete("/delete-product", async (req, res) => {
+  const { category, name } = req.body;
+
+  try {
+    const product = await Product.findOneAndDelete({ category, name });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // remove image from filesystem if exists
+    if (product.image) {
+      const imagePath = path.join(__dirname, "..", "..", "public", product.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+// Get products by category
+router.get("/products", async (req, res) => {
+  try {
+    const { category } = req.query;
+    const query = category ? { category } : {};
+    const products = await Product.find(query).sort({ name: 1 });
+    res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
